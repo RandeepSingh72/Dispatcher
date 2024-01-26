@@ -42,6 +42,7 @@ const AdminAssign = () => {
     try {
       const response = await fetch("https://dispatcher-container.onrender.com/api/allJobs", {
         method: "GET",
+        mode: 'cors',
         headers: {
           "Content-Type": "application/json",
         },
@@ -57,6 +58,7 @@ const AdminAssign = () => {
     try {
       const response = await fetch("https://dispatcher-container.onrender.com/api/unassigned", {
         method: "GET",
+        mode: 'cors',
         headers: {
           "Content-Type": "application/json",
         },
@@ -76,6 +78,7 @@ const AdminAssign = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/updateJob', {
       method: 'PUT',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -87,6 +90,7 @@ const AdminAssign = () => {
 
     const response2 = await fetch('https://dispatcher-container.onrender.com/api/assign-container', {
       method: 'PUT',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
       },

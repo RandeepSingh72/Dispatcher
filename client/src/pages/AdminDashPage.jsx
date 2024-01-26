@@ -14,6 +14,7 @@ const AdminDashPage = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/allUsers', {
         method: 'GET',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -37,6 +38,7 @@ const AdminDashPage = () => {
 
       const response = await fetch('https://dispatcher-container.onrender.com/api/user', {
         method: 'GET',
+        mode: 'cors',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

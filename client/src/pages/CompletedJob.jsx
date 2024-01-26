@@ -7,6 +7,7 @@ const CompletedJob = () => {
     try {
       const response = await fetch("https://dispatcher-container.onrender.com/api/jobs/complete", {
         method: "GET",
+        mode: 'cors',
         headers: {
           "Content-Type": "application/json",
         },

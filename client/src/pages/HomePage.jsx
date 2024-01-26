@@ -13,6 +13,7 @@ const HomePage = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/userlogin', {
         method: 'POST',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -56,6 +57,7 @@ const HomePage = () => {
   
         const response = await fetch('https://dispatcher-container.onrender.com/api/user', {
           method: 'GET',
+          mode: 'cors',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

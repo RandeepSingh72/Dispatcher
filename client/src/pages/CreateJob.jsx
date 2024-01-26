@@ -20,6 +20,7 @@ const CreateJob = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/createJob', {
         method: 'POST',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -56,6 +57,7 @@ const CreateJob = () => {
       try {
         const response = await fetch('https://dispatcher-container.onrender.com/api/addressOptions',{
            method: 'GET',
+           mode: 'cors',
            headers: {
           'Content-Type': 'application/json',
            },
