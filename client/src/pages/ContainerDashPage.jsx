@@ -16,7 +16,7 @@ const ContainerDashPage = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/updateStatus', {
         method: 'PUT',
-        mode: 'cors',
+        mode: 'no-cors',
         headers: {
           "Content-Type": "application/json",
         },
@@ -65,7 +65,7 @@ const ContainerDashPage = () => {
     try {
       const response = await fetch(`https://dispatcher-container.onrender.com/api/container-job?containerNumber=${containerNumber}`, {
         method: "GET",
-        mode: 'cors',
+        mode: 'no-cors',
         headers: {
           "Content-Type": "application/json",
         },

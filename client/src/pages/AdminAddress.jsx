@@ -11,7 +11,7 @@ const AdminAddress = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/saveAddress', {
         method: 'POST',
-        mode: 'cors',
+        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },

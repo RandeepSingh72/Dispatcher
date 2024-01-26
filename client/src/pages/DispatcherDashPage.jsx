@@ -48,7 +48,7 @@ const DispatcherDashPage = () => {
     try {
       const response = await fetch("https://dispatcher-container.onrender.com/api/allJobs", {
         method: "GET",
-        mode: 'cors',
+        mode: 'no-cors',
         headers: {
           "Content-Type": "application/json",
         },
@@ -64,7 +64,7 @@ const DispatcherDashPage = () => {
     try {
       const response = await fetch("https://dispatcher-container.onrender.com/api/unassigned", {
         method: "GET",
-        mode: 'cors',
+        mode: 'no-cors',
         headers: {
           "Content-Type": "application/json",
         },
@@ -84,7 +84,7 @@ const DispatcherDashPage = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/updateJob', {
       method: 'PUT',
-      mode: 'cors',
+      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -96,7 +96,7 @@ const DispatcherDashPage = () => {
 
     const response2 = await fetch('https://dispatcher-container.onrender.com/api/assign-container', {
       method: 'PUT',
-      mode: 'cors',
+      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },

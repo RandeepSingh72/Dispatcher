@@ -16,7 +16,7 @@ const AdminUser = () => {
       try {
         const response = await fetch('https://dispatcher-container.onrender.com/api/saveUser', {
           method: 'POST',
-          mode: 'cors',
+          mode: 'no-cors',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -51,7 +51,7 @@ const AdminUser = () => {
       try {
         const response = await fetch('https://dispatcher-container.onrender.com/api/saveUser', {
           method: 'POST',
-          mode: 'cors',
+          mode: 'no-cors',
           headers: {
             'Content-Type': 'application/json',
           },
