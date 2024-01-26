@@ -40,7 +40,7 @@ const AdminAssign = () => {
 
   const fetchAllJobs = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/allJobs", {
+      const response = await fetch("https://dispatcher-container.onrender.com/api/allJobs", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +55,7 @@ const AdminAssign = () => {
 
   const fetchContainer = async() => {
     try {
-      const response = await fetch("http://localhost:3000/api/unassigned", {
+      const response = await fetch("https://dispatcher-container.onrender.com/api/unassigned", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +74,7 @@ const AdminAssign = () => {
     const selectedContainer = container[jobId];
 
     try {
-      const response = await fetch('http://localhost:3000/api/updateJob', {
+      const response = await fetch('https://dispatcher-container.onrender.com/api/updateJob', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ const AdminAssign = () => {
       }),
     });
 
-    const response2 = await fetch('http://localhost:3000/api/assign-container', {
+    const response2 = await fetch('https://dispatcher-container.onrender.com/api/assign-container', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

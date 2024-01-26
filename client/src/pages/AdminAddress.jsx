@@ -9,7 +9,7 @@ const AdminAddress = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3000/api/saveAddress', {
+      const response = await fetch('https://dispatcher-container.onrender.com/api/saveAddress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

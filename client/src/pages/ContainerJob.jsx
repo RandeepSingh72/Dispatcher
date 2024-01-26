@@ -7,7 +7,7 @@ const ContainerJob = () => {
 
     const getContainerJob = async(containerNumber) => {
         try {
-        const response = await fetch(`http://localhost:3000/api/container-complete-job?containerNumber=${containerNumber}`, {
+        const response = await fetch(`https://dispatcher-container.onrender.com/api/container-complete-job?containerNumber=${containerNumber}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

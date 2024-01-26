@@ -12,7 +12,7 @@ const AdminDashPage = () => {
 
   const fetchAllUsers = async() => {
     try {
-      const response = await fetch('http://localhost:3000/api/allUsers', {
+      const response = await fetch('https://dispatcher-container.onrender.com/api/allUsers', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ const AdminDashPage = () => {
         throw new Error('Token not found');
       }
 
-      const response = await fetch('http://localhost:3000/api/user', {
+      const response = await fetch('https://dispatcher-container.onrender.com/api/user', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

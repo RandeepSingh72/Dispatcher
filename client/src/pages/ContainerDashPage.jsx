@@ -14,7 +14,7 @@ const ContainerDashPage = () => {
 
   const handleAccept = async(jobId, jobStage) => {
     try {
-      const response = await fetch('http://localhost:3000/api/updateStatus', {
+      const response = await fetch('https://dispatcher-container.onrender.com/api/updateStatus', {
         method: 'PUT',
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +62,7 @@ const ContainerDashPage = () => {
 
   const fetchJob = async (containerNumber) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/container-job?containerNumber=${containerNumber}`, {
+      const response = await fetch(`https://dispatcher-container.onrender.com/api/container-job?containerNumber=${containerNumber}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

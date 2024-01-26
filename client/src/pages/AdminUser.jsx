@@ -14,7 +14,7 @@ const AdminUser = () => {
 
     if (userType === 'container') {
       try {
-        const response = await fetch('http://localhost:3000/api/saveUser', {
+        const response = await fetch('https://dispatcher-container.onrender.com/api/saveUser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ const AdminUser = () => {
       }
     }else{
       try {
-        const response = await fetch('http://localhost:3000/api/saveUser', {
+        const response = await fetch('https://dispatcher-container.onrender.com/api/saveUser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
