@@ -14,7 +14,7 @@ const Job = require('./models/jobModel');
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'https://brilliant-vacherin-0e3af3.netlify.app');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   next();
 });
 
