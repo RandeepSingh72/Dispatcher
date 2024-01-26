@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT ||  10000;
 const cors = require('cors');
 const User = require('./models/usersModel');
 const Address = require('./models/address');
@@ -12,7 +12,7 @@ const { default: mongoose } = require('mongoose');
 const Job = require('./models/jobModel');
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://fabulous-cactus-a4134a.netlify.app');
+  res.header('Access-Control-Allow-Origin', 'https://brilliant-vacherin-0e3af3.netlify.app');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
