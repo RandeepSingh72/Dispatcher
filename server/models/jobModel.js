@@ -10,6 +10,8 @@ const jobSchema = new mongoose.Schema({
   pin: { type: String, required: true },
   random: { type: String, required: true },
   doors:{ type: String, required: true },
+  dg:{type: String, required: true},
+  weight:{type: String, required: true},
   commodityCode: { type: String, required: true },
   instructions: { type: String, required: true },
   containerNum: { type: String, required: false },

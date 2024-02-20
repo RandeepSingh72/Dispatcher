@@ -11,15 +11,23 @@ const AdminAssign = () => {
     const today = new Date();
     const differenceInMilliseconds = jobStart.getTime() - today.getTime();
     const differenceInDays = Math.ceil(differenceInMilliseconds / (24 * 60 * 60 * 1000));
-  
+   
     // If today is one day away from jobStart, change color
     if (differenceInDays === 1 && !containerNum) {
-      return '#EE5938'; // Set your desired color here
+      return {
+        backgroundColor: '#EE5938', // Set your desired background color here
+        textColor: 'white', // Set your desired text color here
+      };
     }
   
-    // Default color
-    return 'black';
+    // Default colors
+    return {
+      backgroundColor: 'white',
+      textColor: 'black',
+    };
+    
   };
+  
 
   const calculateDaysDifference = (date1, date2) => {
     const differenceInMilliseconds = Math.abs(date1.getTime() - date2.getTime());
@@ -34,15 +42,23 @@ const AdminAssign = () => {
     return { ...job, daysDifference };
   });
   
-  const sortedJobs = jobsWithDaysDifference.sort((a, b) => a.daysDifference - b.daysDifference);
+  const sortedJobs = jobsWithDaysDifference.sort((a, b) => {
+    if (!a.containerNum && b.containerNum) {
+      return -1;
+  }
+  // If a job is assigned and b job is not assigned, b should come before a
+  if (a.containerNum && !b.containerNum) {
+      return 1;
+  }
+  // If both jobs are either assigned or not assigned, sort by daysDifference
+  return a.daysDifference - b.daysDifference;
+  })
 
- 
 
   const fetchAllJobs = async () => {
     try {
       const response = await fetch("https://dispatcher-container.onrender.com/api/allJobs", {
         method: "GET",
-        mode: 'no-cors',
         headers: {
           "Content-Type": "application/json",
         },
@@ -58,7 +74,6 @@ const AdminAssign = () => {
     try {
       const response = await fetch("https://dispatcher-container.onrender.com/api/unassigned", {
         method: "GET",
-        mode: 'no-cors',
         headers: {
           "Content-Type": "application/json",
         },
@@ -78,7 +93,6 @@ const AdminAssign = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/updateJob', {
       method: 'PUT',
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -90,7 +104,6 @@ const AdminAssign = () => {
 
     const response2 = await fetch('https://dispatcher-container.onrender.com/api/assign-container', {
       method: 'PUT',
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -125,16 +138,18 @@ const AdminAssign = () => {
   return (
     <div className='m-5'>
             {jobs &&
-              sortedJobs.map((job) => (
+              sortedJobs.map((job) => {
+                const { backgroundColor, textColor } = getColorBasedOnDate(job.jobStart, job.containerNum);
+                return (
                 <div
                   key={job._id}
-                  style={{ position: "relative", backgroundColor: getColorBasedOnDate(job.jobStart, job.containerNum) }}
-                  className={`${job.containerNum ? 'mt-12' : 'mt-24'} p-2 rounded-tr-md rounded-br-md rounded-bl-md bg-black text-white`}
+                  style={{ position: "relative", backgroundColor, color: textColor}}
+                  className={`${job.containerNum ? 'mt-12' : 'mt-24'} px-5 pb-4 pt-1 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl`}
                 >
                     {job.containerNum ? (
                        <div
                        style={{ position: "absolute" }}
-                       className="top-[-31px] left-0 bg-blue-600 my-2 px-2 rounded-t-md font-semibold"
+                       className="top-[-31px] left-0 bg-blue-600 my-2 px-2 rounded-t-md font-semibold text-white"
                      >
                       <div>
                         Container No. {job.containerNum}
@@ -168,51 +183,59 @@ const AdminAssign = () => {
                   <div className="font-semibold mt-4 grid sm:grid-cols-2 grid-cols-1">
                     <div>
                     <div >
-                    Start Date - <span className="font-semibold text-white">{job.jobStart}</span>
+                    Start Date - <span className="font-normal">{job.jobStart}</span>
                     <br />
                   </div>
                   <div>
-                    PIN - <span className="font-light text-white">{job.pin}</span>
+                    PIN - <span className='font-normal'>{job.pin}</span>
                   </div>
                   <div>
-                    Slot - <span className="font-light text-white">{job.slot}</span>
+                    Slot - <span className='font-normal'>{job.slot}</span>
                   </div>
                   <div>
-                    Commodity Code - <span className="font-light text-white">{job.commodityCode}</span>
+                    Commodity Code - <span className="font-normal">{job.commodityCode}</span>
                   </div>
                   <div>
-                    Size - <span className="font-light text-white">{job.size}ft.</span>
+                    Size - <span className="font-normal">{job.size} ft.</span>
+                  </div>
+                  <div>
+                    DG - <span className="font-normal">{job.dg}</span>
                   </div>
                     </div>
 
                     <div> 
                     <div >
-                    Uplift Address - <span className="font-light text-white">{job.uplift}</span>
+                    Uplift Address - <span className="font-normal">{job.uplift}</span>
                     <br />
                   </div>
                   <div >
-                    Offload Address - <span className="font-light text-white">{job.offload}</span>
+                    Offload Address - <span className="font-normal">{job.offload}</span>
                     <br />
                   </div>
                   <div >
-                    Doors - <span className="font-light text-white">{job.doors}</span>
+                    Doors - <span className="font-normal">{job.doors}</span>
                     <br />
                   </div>
                   <div >
-                    Random - <span className="font-light text-white">{job.random}</span>
+                    Random - <span className="font-normal">{job.random}</span>
                     <br />
                   </div>
                   <div >
-                    Release - <span className="font-light text-white">{job.release}</span>
+                    Release - <span className="font-normal">{job.release}</span>
                     <br />
+                  </div>
+                  <div>
+                    Weight - <span className="font-normal">{job.weight} Kg</span>
                   </div>
                     </div>
                   
                   </div>
                   <div className="mt-1">
-                  <span className="font-bold">Instructions</span> - {job.instructions}
+                  <span className="font-bold">Special Instructions:</span>
+                  <br/>
+                  <span className='text-lg'>{job.instructions}</span>
                   </div>
-                  <div className='px-2 mt-2 font-semibold bg-purple-400 rounded-md text-black'>
+                  <div className='px-2 mt-2 font-semibold bg-purple-400 rounded-md text-white'>
                   <div className='flex items-center justify-center '>
                   Status
                   </div>
@@ -232,7 +255,7 @@ const AdminAssign = () => {
                  </div>
                   
                 </div>
-              ))}
+)})}
           </div>
   )
 }

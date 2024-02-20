@@ -2,7 +2,6 @@ import React, {useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
-import profile from '../assets/profile.svg';
 
 const AdminDashPage = () => {
   const [users, setUsers] = useState([])
@@ -14,7 +13,6 @@ const AdminDashPage = () => {
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/allUsers', {
         method: 'GET',
-        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -38,7 +36,6 @@ const AdminDashPage = () => {
 
       const response = await fetch('https://dispatcher-container.onrender.com/api/user', {
         method: 'GET',
-        mode: 'no-cors',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -48,7 +45,6 @@ const AdminDashPage = () => {
       if (response.ok) {
          const userData = await response.json();
          setUser(userData);
-         
         // Check if user is logged in and userType is available
         if (userData.userType) {
           const dashboardRoute = `/${userData.userType.toLowerCase()}-dashboard`;
@@ -71,40 +67,35 @@ const AdminDashPage = () => {
     fetchUser();
   }
   }, []);
+  useEffect(() => {
+    fetchAllUsers()
+    if (user === undefined) {
+      fetchUser();
+    }
+    }, [pathname]);
 
   console.log(user);
   return (
     <div>
       <div className='flex justify-between items-center'>
       <Sidebar/>
-      <div className='flex flex-row gap-1 mr-3'>
-        <div>
-        <img src={profile} alt="profile" className='w-[35px] h-[35px]' />
-        </div>
-        <div className='text-black mt-1 capitalize font-bold'>
-          {user.username}
-        </div>
-      </div>
+      
       </div>
           {pathname !== '/admin-dashboard' ? <Outlet/> : (
-            <div className='m-5'>
-              {users && users.map((user)=>(
-                <div key={user.username} style={{position: 'relative'}} className='my-10 p-2 rounded-md bg-black text-white'>
-                  <div style={{position: 'absolute'}} className='top-[-31px] left-0 bg-blue-600 my-2 px-2 rounded-t-md font-semibold'>
-                    {user.userType.toUpperCase()}
-                  </div>
-                  {user.containerNumber && (
-                    <div style={{position: 'absolute'}} className='top-[-31px] right-0 bg-blue-600 my-2 px-2 rounded-t-md font-semibold'>
-                   No. {user.containerNumber.toUpperCase()}
-                  </div>
-                  )}
-                  <div>
-                   UserName - <span className='font-semibold'>{user.username}</span><br/>
-                  Email - <span className='font-semibold'>{user.email}</span>
-                  </div>
-                  
+            <div className='m-5 flex flex-row'>
+              <div className='p-2 m-2 bg-white rounded-xl'>
+                <div className='mr-6 ml-1'>
+                <h2>Container</h2>
+                <span className='font-bold'>{users.filter(user => user.userType === 'container').length}</span>
                 </div>
-              ))}
+              </div>
+
+              <div className='p-2 m-2 bg-white rounded-xl'>
+                <div className='mr-6 ml-1'>
+                <h2>Dispatcher</h2>
+                <span className='font-bold'>{users.filter(user => user.userType === 'dispatcher').length}</span>
+                </div>
+              </div>
             </div>
           )}
     </div>

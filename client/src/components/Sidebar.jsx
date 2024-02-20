@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import close from '../assets/close.svg';
 import open from '../assets/open.svg';
+import image1 from '../assets/image 1.png';
 
 const Sidebar = () => {
     const {logout} = useAuth();
@@ -26,46 +27,59 @@ const Sidebar = () => {
       <img src={open} alt="open" className='bg-black rounded-md w-[35px] h-[35px]' />
       </button>
       
-     <div style={{position: 'absolute', top: '0', left: '0', zIndex: '100'}} className={`bg-gray-800 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-[0]' : 'translate-x-[-100%]'} h-full text-white min-w-[200px]`}>
+     <div style={{position: 'fixed', top: '0', left: '0', zIndex: '100'}} className={`bg-white transition-transform duration-300 min-h-full ${isSidebarOpen ? 'translate-x-[0]' : 'translate-x-[-100%]'} min-w-[200px]`}>
       <div>
         <button
           onClick={toggleSidebar}
-          className="text-white ml-36 mt-5 focus:outline-none focus:bg-gray-700"
+          className="text-white ml-40 mt-5 focus:outline-none focus:bg-gray-700"
         >
           <div>
             <img src={close} alt="close" className='bg-white rounded-md w-[35px] h-[35px]'/>
           </div>
         </button>
       </div>
-      <div className={`my-2 mx-2 gap-2`}>
+      <div className={`my-2 mx-2 px-5 gap-2`}>
+        <div>
+          <img src={image1} alt="logo" />
+        </div>
+        <h1 className='font-bold mt-2 mb-3'>ADMIN</h1>
+        <hr/>
         <Link
           to="/admin-dashboard"
-          className={`block m-1 p-2 text-white rounded-md hover:bg-gray-700 ${
-            location.pathname === '/admin-dashboard' ? 'bg-gray-700' : ''
+          className={`block m-1 mb-3 mt-3 rounded-md hover:font-bold ${
+            location.pathname === '/admin-dashboard' ? 'font-bold' : 'text-gray-800'
           }`}
         >
           Dashboard
         </Link>
         <Link
           to="/admin-dashboard/users"
-          className={`block m-1 p-2 rounded-md text-white hover:bg-gray-700 ${
-            location.pathname === '/admin-dashboard/users' ? 'bg-gray-700' : ''
+          className={`block m-1 mb-3 rounded-md hover:font-bold ${
+            location.pathname === '/admin-dashboard/users' ? 'font-bold' : 'text-gray-800'
           }`}
         >
          Add Users
         </Link>
         <Link
           to="/admin-dashboard/address"
-          className={`block m-1 p-2 rounded-md text-white hover:bg-gray-700 ${
-            location.pathname === '/admin-dashboard/address' ? 'bg-gray-700' : ''
+          className={`block m-1 mb-3 rounded-md hover:font-bold ${
+            location.pathname === '/admin-dashboard/address' ? 'font-bold' : 'text-gray-800'
           }`}
         >
         Add Address
         </Link>
         <Link
+          to="/admin-dashboard/add-job"
+          className={`block m-1 mb-3 rounded-md hover:font-bold ${
+            location.pathname === '/admin-dashboard/add-job' ? 'font-bold' : 'text-gray-800'
+          }`}
+        >
+          Add Job
+        </Link>
+        <Link
           to="/admin-dashboard/assign-job"
-          className={`block m-1 p-2 rounded-md text-white hover:bg-gray-700 ${
-            location.pathname === '/admin-dashboard/assign-job' ? 'bg-gray-700' : ''
+          className={`block m-1 mb-3 rounded-md hover:font-bold ${
+            location.pathname === '/admin-dashboard/assign-job' ? 'font-bold' : 'text-gray-800'
           }`}
         >
           Assign Job

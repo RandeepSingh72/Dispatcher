@@ -11,6 +11,7 @@ import AdminAssign from './pages/AdminAssign';
 import CreateJob from './pages/CreateJob';
 import CompletedJob from './pages/CompletedJob';
 import ContainerJob from './pages/ContainerJob';
+import NewJob from './pages/NewJob';
 
 
 function App() {
@@ -23,7 +24,7 @@ console.log(user);
       return <Navigate to="/" />;
     }
     if (isLoggedIn() && user?.userType !== userType) {
-      return <Navigate to={'/'} />
+      return <Navigate to="/" />
     }
   
     return element
@@ -38,6 +39,7 @@ console.log(user);
     >
       <Route path='users' element={<AdminUser />}/>
       <Route path='address' element={<AdminAddress/>}/>
+      <Route path='add-job' element={<CreateJob/>}/>
       <Route path='assign-job' element={<AdminAssign/>}/>
     </Route>
     <Route
@@ -45,12 +47,14 @@ console.log(user);
       element={<PrivateRoute element={<DispatcherDashPage />} userType="dispatcher" />}
     >
       <Route path='create-job' element={<CreateJob />}/>
+      <Route path='job-list' element={<AdminAssign />}/>
       <Route path='completed-job' element={<CompletedJob/>}/>
     </Route> 
     <Route
       path="/container-dashboard"
       element={<PrivateRoute element={<ContainerDashPage />} userType="container" />}
     >
+      <Route path='new-job' element={<NewJob />}/>
       <Route path='finished-job' element={<ContainerJob />}/>
       </Route>
    </Routes>
