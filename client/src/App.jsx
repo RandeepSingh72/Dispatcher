@@ -12,6 +12,7 @@ import CreateJob from './pages/CreateJob';
 import CompletedJob from './pages/CompletedJob';
 import ContainerJob from './pages/ContainerJob';
 import NewJob from './pages/NewJob';
+import ExcelJob from './pages/ExcelJob';
 
 
 function App() {
@@ -41,13 +42,15 @@ console.log(user);
       <Route path='address' element={<AdminAddress/>}/>
       <Route path='add-job' element={<CreateJob/>}/>
       <Route path='assign-job' element={<AdminAssign/>}/>
+      <Route path='listed-job' element={<ExcelJob/>}/>
     </Route>
     <Route
       path="/dispatcher-dashboard"
       element={<PrivateRoute element={<DispatcherDashPage />} userType="dispatcher" />}
     >
       <Route path='create-job' element={<CreateJob />}/>
-      <Route path='job-list' element={<AdminAssign />}/>
+      <Route path='assign-jobs' element={<AdminAssign />}/>
+      <Route path='job-lists' element={<ExcelJob />}/>
       <Route path='completed-job' element={<CompletedJob/>}/>
     </Route> 
     <Route

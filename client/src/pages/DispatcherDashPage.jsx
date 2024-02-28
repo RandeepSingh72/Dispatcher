@@ -4,7 +4,7 @@ import DispatcherSidebar from "../components/DispatcherSidebar";
 
 const DispatcherDashPage = () => {
   const { pathname } = useLocation();
-  
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -24,7 +24,7 @@ const DispatcherDashPage = () => {
               <div className='p-2 m-2 bg-white rounded-xl'>
                 <div className='mr-6 ml-1 pb-2'>
                   <h2 className="font-bold mb-2">View Job List</h2>
-                <Link to={'/dispatcher-dashboard/job-list'} className="btn-link px-4 py-1 ">View</Link>
+                <Link to={'/dispatcher-dashboard/job-lists'} className="btn-link px-4 py-1 ">View</Link>
                 </div>
               </div>
         </div>

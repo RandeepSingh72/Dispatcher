@@ -29,3 +29,15 @@ html{
 .bg-purple-70{
   background-color: #F0EDFF;
 }
+.custom-table th {
+  padding: 10px; /* Adjust padding as needed */
+  white-space: nowrap;
+}
+
+.custom-table tr:not(:first-child) th {
+  border-top: 2px solid #fff; /* Add top border to create gap between rows */
+}
+
+.custom-table td {
+  padding: 10px; /* Adjust padding as needed */
+}

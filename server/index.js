@@ -366,6 +366,16 @@ app.get('/api/container-complete-job', async(req, res) => {
    res.status(500).json({ success: false, error: error.message });
  }
 })
+
+app.get('/api/jobs/all', async(req, res) => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URL);
+    const jobs = await Job.find({});
+    res.json({ jobs });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+})
  // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

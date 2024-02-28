@@ -84,6 +84,14 @@ const Sidebar = () => {
         >
           Assign Job
         </Link>
+        <Link
+          to="/admin-dashboard/listed-job"
+          className={`block m-1 mb-3 rounded-md hover:font-bold ${
+            location.pathname === '/admin-dashboard/listed-job' ? 'font-bold' : 'text-gray-800'
+          }`}
+        >
+          Job List
+        </Link>
         <button className='btn mt-5' onClick={handleLogout}>Logout</button>
       </div>
     </div>
