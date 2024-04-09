@@ -61,7 +61,7 @@ const AdminAddress = () => {
                 placeholder="Name of owner"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
                 id="username"
-                required
+                
               />
             </div>
           </div>
@@ -91,7 +91,7 @@ const AdminAddress = () => {
                 placeholder="Email"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
                 id="email"
-                required
+                
               />
             </div>
           </div>
@@ -127,7 +127,6 @@ const AdminAddress = () => {
                 placeholder="Type Address Here"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
                 id="address"
-                required
               />
             </div>
           </div>

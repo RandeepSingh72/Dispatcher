@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const addressSchema = new mongoose.Schema({
-    name: { type: String, required: true},
-    address: { type: String, required: true},
-    email: { type: String, required: true},
+    name: { type: String, required: false},
+    address: { type: String, required: false},
+    email: { type: String, required: false},
 });
   
 const Address = mongoose.model('Address', addressSchema);

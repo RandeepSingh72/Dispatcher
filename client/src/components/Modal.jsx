@@ -71,7 +71,6 @@ const Modal = ({ isOpen, onClose, setUpdate }) => {
                       placeholder="Name of owner"
                       className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
                       id="username"
-                      required
                       autoComplete="yes"
                     />
                   </div>
@@ -102,7 +101,6 @@ const Modal = ({ isOpen, onClose, setUpdate }) => {
                       placeholder="Email"
                       className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
                       id="email"
-                      required
                       autoComplete="off"
                     />
                     
@@ -140,7 +138,6 @@ const Modal = ({ isOpen, onClose, setUpdate }) => {
                       placeholder="Type Address Here"
                       className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
                       id="address"
-                      required
                       autoComplete="off"
                     />
                   </div>

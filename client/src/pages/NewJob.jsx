@@ -1,11 +1,13 @@
 import React, {useState, useEffect} from 'react'
 import { useAuth } from '../context/AuthContext';
+import SafetyForm from '../components/SafetyForm';
+
 
 const NewJob = () => {
   const [jobs, setJobs] = useState([]);
-  const [jobStage, setJobStage] = useState('accept');
-  const [jobId, setJobId] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
   const {user} = useAuth();
+  const [options, setOptions] = useState([]);
 
   const handleAccept = async(jobId, jobStage) => {
     try {
@@ -19,97 +21,91 @@ const NewJob = () => {
           jobStage
         }),
       });
-       await response.json();
+      const data = await response.json();
+      console.log(data);
+      const updatedJobs = jobs.map((job) =>
+        job._id === jobId ? { ...job, status: [...job.status, { type: jobStage, timestamp: new Date() }] } : job
+      );
+      console.log(updatedJobs);
+      setJobs(updatedJobs);
+      fetchJob(user.userMainId);
     } catch (error) {
       console.log(error);
     }
    }
 
 
-  const handleButtonClick = () => {
-    switch (jobStage) {
-      case 'accept':
-        setJobStage('uplift')
-        // Implement logic for 'Accept Job' stage
-       handleAccept(jobId, jobStage);
-        break;
-      case 'uplift':
-        setJobStage('offload');
-        // Implement logic for 'Uplift Job' stage
-        handleAccept(jobId, jobStage)
-        break;
-      case 'offload':
-        setJobStage('done');
-        // Implement logic for 'Offload Job' stage
-        handleAccept(jobId, jobStage)
-        break;
-        case 'done':
-        setJobStage('Thanks');
-        // Implement logic for 'Offload Job' stage
-        handleAccept(jobId, jobStage)
-        break;
-      // Add more cases for additional stages
-      default:
-        handleAccept(jobId, jobStage)
-        break;
-    }
-  };
-
-  const fetchJob = async (containerNumber) => {
+  const fetchJob = async (userMainId) => {
     try {
-      const response = await fetch(`https://dispatcher-container.onrender.com/api/container-job?containerNumber=${containerNumber}`, {
+      const response = await fetch(`https://dispatcher-container.onrender.com/api/container-job?userMainId=${userMainId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
       const containerJob = await response.json();
+      console.log(containerJob);
       setJobs(containerJob.jobs)
-      console.log(containerJob.jobs[0].status);
-      setJobId(containerJob.jobs.length > 0 && containerJob.jobs[0]._id)
-      if (containerJob.jobs[0].status && containerJob.jobs[0].status.length > 0) {
-        const lastStatus = containerJob.jobs[0].status[containerJob.jobs[0].status.length - 1];
-  console.log(lastStatus);
-        if (lastStatus.type === 'accept') {
-          setJobStage('uplift');
-        } if (lastStatus.type === 'uplift') {
-      
-          setJobStage('offload');
-        }
-        if (lastStatus.type === 'offload') {
-          
-          setJobStage('done');
-        }
-        if (lastStatus.type === 'done') {
-          
-          setJobStage('Thanks');
-        }
-      } else {
-        setJobStage('accept'); // Default to 'accept' if status is empty
-      }
     } catch (error) {
       console.log(error);
     }
   }
 
-  useEffect(()=>{
-     fetchJob(user.containerNumber);
-  }, [])
+
+  const handleSafetyFormClose = () => {
+    // Update the last filled date in localStorage when the safety form is filled
+    localStorage.setItem('lastFilledDate', new Date().toISOString().slice(0, 10));
+    setIsOpen(false);
+  };
 
   useEffect(()=>{
-    fetchJob(user.containerNumber);
- }, [jobStage])
+    fetchJob(user.userMainId);
+    const fetchOptions = async () => {
+      try {
+        const response = await fetch(
+          "https://dispatcher-container.onrender.com/api/addressOptions",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch options");
+        }
+        const data = await response.json();
+        setOptions(data.addresses);
+      } catch (error) {
+        console.error("Error fetching uplift options:", error);
+      }
+    };
+
+    fetchOptions();
+
+    const lastFilledDate = localStorage.getItem('lastFilledDate');
+    const todayDate = new Date().toISOString().slice(0, 10); // Get today's date in YYYY-MM-DD format
+
+    if (!lastFilledDate || lastFilledDate !== todayDate) {
+      setIsOpen(true); // Show the safety form if it hasn't been filled today
+    }
+  }, [])
+
+
+
   return (
     <div className='p-5 m-2'>
+     <SafetyForm isOpen={isOpen} handleSafetyFormClose={handleSafetyFormClose} options={options}/>
         {jobs.length !== 0 ? jobs.map((job)=>(
-                <div key={job._id} style={{position: 'relative'}} className='bg-white p-2 font-semibold rounded-md mt-10'>
+                <div key={job._id} style={{position: 'relative'}} className='bg-white p-2 font-semibold rounded-md mt-14'>
                     {job.status.length !== 0 ? (
                        <div
                        style={{ position: "absolute" }}
                        className="top-[-46px] left-0 bg-blue-600 text-white my-2 px-2 rounded-t-md font-semibold"
                      >
+                      
                       <div className='p-2'>
-                        Status: {job.status[job.status.length-1].type}
+                        Status: <span className='capitalize'>{job.status[job.status.length-1].type}</span>
                       </div>
                       </div>) : (
                         <div style={{ position: "absolute" }}
@@ -138,6 +134,9 @@ const NewJob = () => {
                   </div>
                   <div>
                   DG - <span className='font-normal'>{job.dg}</span> 
+                  </div>
+                  <div>
+                  Container No. - <span className='font-normal'>{job.containerNumber}</span> 
                   </div>
                     </div>
 
@@ -184,15 +183,34 @@ const NewJob = () => {
                  </div>
 
                  <div className='flex items-center justify-center my-5'>
-                  <div>
-                  <button className={`stage-btn ${jobStage === 'Thanks' && 'cursor-not-allowed opacity-50 pointer-events-none'} ${jobStage === 'accept' && 'bg-gradient-to-r from-[#69a875] to-[#2bdb03be]'} ${jobStage === 'uplift' && 'bg-gradient-to-r from-[#8779c4] to-[#5f3cffe4]'} ${jobStage === 'offload' && 'bg-gradient-to-r from-[#f293ff] to-[#0e1afebe]'} ${jobStage === 'done' && 'bg-gradient-to-r from-[#ff2c2c] to-[#0751ff]'}`} onClick={handleButtonClick}>
-                  {jobStage === 'accept' && 'Accept Job'}
-                  {jobStage === 'uplift' && 'Uplift Done'}
-                  {jobStage === 'offload' && 'Offload Done'}
-                  {jobStage === 'done' && 'Job Done'}
-                  {jobStage === 'Thanks' && '✔'}
-                  </button>
-                  </div>
+                 <button
+                  className={`stage-btn ${job.status.length === 0 ? 'bg-gradient-to-r from-[#69a875] to-[#2bdb03be]' : 'cursor-not-allowed opacity-50 pointer-events-none hidden'}`}
+                  onClick={() => handleAccept(job._id, 'accept')}
+                  disabled={job.status.includes('accept')}
+                >
+                  Accept Job
+                </button>
+                <button
+                  className={`stage-btn ${job.status[job.status.length - 1]?.type === 'accept' ? 'bg-gradient-to-r from-[#8779c4] to-[#5f3cffe4]' : 'cursor-not-allowed opacity-50 pointer-events-none hidden'}`}
+                  onClick={() => handleAccept(job._id, 'uplift')}
+                  disabled={job.status.includes('uplift')}
+                >
+                  Uplift Done
+                </button>
+                <button
+                  className={`stage-btn ${job.status[job.status.length - 1]?.type === 'uplift' ? 'bg-gradient-to-r from-[#f293ff] to-[#0e1afebe]' : 'cursor-not-allowed opacity-50 pointer-events-none hidden'}`}
+                  onClick={() => handleAccept(job._id, 'offload')}
+                  disabled={job.status.includes('offload')}
+                >
+                  Offload Done
+                </button>
+                <button
+                  className={`stage-btn ${job.status[job.status.length - 1]?.type === 'offload'? 'bg-gradient-to-r from-[#f87575] to-[#0751ff]' : 'cursor-not-allowed opacity-50 pointer-events-none hidden'}`}
+                  onClick={() => handleAccept(job._id, 'done')}
+                  disabled={job.status.includes('done')}
+                >
+                  Job Done
+                </button>
                  </div>
                 </div>
               )) : (

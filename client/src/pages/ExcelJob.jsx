@@ -1,12 +1,21 @@
 import React, {useState, useEffect, useRef} from 'react'
 import { DownloadTableExcel } from 'react-export-table-to-excel';
+import ReactPaginate from 'react-paginate';
 
 const ExcelJob = () => {
   const [allJobs, setAllJobs] = useState([]);
   const tableRef = useRef(null);
-  const [container, setContainer] = useState({});
-  const [containers, setContainers] = useState([]);
+  const [id, setId] = useState({});
+  const [ids, setIds] = useState([]);
   const [updates, setUpdates] = useState([])
+  const [pageNumber, setPageNumber] = useState(0);
+  const [showAllJobs, setShowAllJobs] = useState(false); // State to toggle showing all jobs
+
+  const toggleShowAllJobs = () => {
+    setShowAllJobs(!showAllJobs);
+    setPageNumber(0); // Reset page number when toggling
+  };
+  const jobsPerPage = 10;
 
   const getColorBasedOnDate = (jobStartDate, containerNum) => {
     const jobStart = new Date(jobStartDate);
@@ -71,7 +80,7 @@ const ExcelJob = () => {
     }
   }
 
-  const fetchContainer = async() => {
+  const fetchIds = async() => {
     try {
       const response = await fetch("https://dispatcher-container.onrender.com/api/unassigned", {
         method: "GET",
@@ -80,7 +89,7 @@ const ExcelJob = () => {
         },
       });
       const containers = await response.json();
-      setContainers(containers)
+      setIds(containers)
     } catch (error) {
       console.log(error);
     }
@@ -89,7 +98,7 @@ const ExcelJob = () => {
   const handleAssign = async (e, jobId) => {
     e.preventDefault();
 
-    const selectedContainer = container[jobId];
+    const selectedId = id[jobId];
 
     try {
       const response = await fetch('https://dispatcher-container.onrender.com/api/updateJob', {
@@ -98,28 +107,19 @@ const ExcelJob = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        selectedContainer,
+        selectedId,
         jobId,
       }),
     });
 
-    const response2 = await fetch('https://dispatcher-container.onrender.com/api/assign-container', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        selectedContainer
-      }),
-    })
+    
 
-    if (!response.ok && !response2.ok) {
+    if (!response.ok ) {
       throw new Error('Failed to update job');
     }
 
     const updatedJob = await response.json();
-    const updateUser = await response2.json()
-    setUpdates(updatedJob, updateUser)
+    setUpdates(updatedJob)
     console.log('Job updated successfully:', updatedJob);
 
     } catch (error) {
@@ -127,28 +127,45 @@ const ExcelJob = () => {
     }
   };
 
+  const pageCount = Math.ceil(
+    (showAllJobs ? allJobs.length : sortedJobs.length) / jobsPerPage
+  );
+  const offset = pageNumber * jobsPerPage;
+  const currentPageJobs = showAllJobs ? allJobs : sortedJobs.slice(offset, offset + jobsPerPage);
+
+  const handlePageChange = ({ selected }) => {
+    setPageNumber(selected);
+  };
 
   useEffect(()=>{
     getAllJobs()
-    fetchContainer()
+    fetchIds()
   }, [])
 
   useEffect(() => {
     getAllJobs()
-    fetchContainer();
+    fetchIds();
   }, [updates]);
+
+  const rowStyle = {
+    borderBottom: '1px solid #ccc', // You can adjust the border style as needed
+  };
 
   return (
     <div>
+      <button className='btn mt-3 ml-4' onClick={toggleShowAllJobs}>
+        {showAllJobs ? 'Show Paginated Jobs' : 'Show All Jobs'}
+      </button>
        <DownloadTableExcel
                     filename="jobs table"
                     sheet="jobs"
                     currentTableRef={tableRef.current}
                 >
-                   <button className='btn mt-3 ml-4'>Export Excel</button>
-        </DownloadTableExcel>
-        <div className='m-5 bg-white rounded-xl'>
-            <div className='overflow-x-auto p-4'>
+                   <button className='btn mt-3 ml-4'>Export Page Jobs</button>
+       </DownloadTableExcel>
+        <div className='m-5 bg-white rounded-xl '>
+            <div className='overflow-x-auto p-2 pb-4'>
+              <div className='table-container'>
             <table ref={tableRef} className='custom-table'>
                  <tbody>
                     <tr>
@@ -164,13 +181,14 @@ const ExcelJob = () => {
                         <th>Random:</th>
                         <th>Release:</th>
                         <th>Weight</th>
-                        <th>Sp. Instructions</th>
-                        <th>Assign Con.</th>
+                        <th>Special Instructions</th>
+                        <th>Container Number</th>
+                        <th>Assign User</th>
                     </tr>
-                    {sortedJobs.map((job)=>{
-                      const { backgroundColor, textColor } = getColorBasedOnDate(job.jobStart, job.containerNum);
+                    {currentPageJobs.map((job)=>{
+                      const { backgroundColor, textColor } = getColorBasedOnDate(job.jobStart, job.userMainId);
                       return(
-                        <tr key={job._id} style={{ backgroundColor, color: textColor}}>
+                        <tr key={job._id} style={{...rowStyle, backgroundColor, color: textColor}}>
                         <td>{job.jobStart}</td>
                         <td>{job.pin}</td>
                         <td>{job.slot}</td>
@@ -184,22 +202,23 @@ const ExcelJob = () => {
                         <td>{job.release}</td>
                         <td>{job.weight}</td>
                         <td>{job.instructions}</td>
-                        {job.containerNum ? (
-                          <td>{job.containerNum}</td>
+                        <td>{job.containerNumber}</td>
+                        {job.userMainId ? (
+                          <td>{job.userMainId}</td>
                         ) : (
                           <td>
                             <form onSubmit={(e)=>handleAssign(e, job._id)} className="flex items-center min-w-full">
                             <select
-                          value={container[job._id] || ""}
+                          value={id[job._id] || ""}
                           required
-                          onChange={(e) => setContainer({ ...container, [job._id]: e.target.value })}
+                          onChange={(e) => setId({ ...id, [job._id]: e.target.value })}
                           className="rounded-md p-2 bg-white text-black ring-1 ring-blue-500 ring-opacity-2 focus:outline-none my-3 ml-1 min-w-50"
                         >
                           <option value="" disabled>
-                            Select Container
+                            Select User ID
                           </option>
-                          {containers && containers.map((cont) => (
-                            <option key={cont._id} value={cont.containerNumber}>{cont.containerNumber}</option>
+                          {ids && ids.map((cont) => (
+                            <option key={cont._id} value={cont.userMainId}>{cont.userMainId}</option>
                           ))}
                         </select>
                         <button type="submit" className="bg-black m-2.5 text-white py-1 px-4 rounded-md">Assign</button>
@@ -210,6 +229,22 @@ const ExcelJob = () => {
                      )})}
                   </tbody>
                 </table>
+                </div>
+                <div className='pagination-container'>
+                  {showAllJobs ? null : (
+                    <ReactPaginate
+                    previousLabel={'Prev.'}
+                    nextLabel={'Next'}
+                    pageCount={pageCount}
+                    onPageChange={handlePageChange}
+                    containerClassName={'pagination'}
+                    previousLinkClassName={'pagination__link'}
+                    nextLinkClassName={'pagination__link'}
+                    disabledClassName={'pagination__link--disabled'}
+                    activeClassName={'pagination__link--active'}
+                  />
+                  )}    
+               </div>
             </div>
         </div>
     </div>

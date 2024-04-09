@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Routes, Route, Navigate} from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import AdminDashPage from './pages/AdminDashPage';
@@ -7,18 +7,23 @@ import ContainerDashPage from './pages/ContainerDashPage';
 import { useAuth } from './context/AuthContext';
 import AdminUser from './pages/AdminUser';
 import AdminAddress from './pages/AdminAddress';
-import AdminAssign from './pages/AdminAssign';
 import CreateJob from './pages/CreateJob';
 import CompletedJob from './pages/CompletedJob';
 import ContainerJob from './pages/ContainerJob';
 import NewJob from './pages/NewJob';
 import ExcelJob from './pages/ExcelJob';
-
+import ReportSection from './pages/ReportSection';
 
 function App() {
-  const { isLoggedIn, user} = useAuth();
+  const { isLoggedIn, user, setUser} = useAuth();
 
-console.log(user);
+  useEffect(() => {
+    const userDataString = localStorage.getItem('userInfo');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      setUser(userData);
+    }
+  }, [setUser]);
 
   function PrivateRoute({ userType, element }) {
     if (!isLoggedIn()) {
@@ -41,17 +46,17 @@ console.log(user);
       <Route path='users' element={<AdminUser />}/>
       <Route path='address' element={<AdminAddress/>}/>
       <Route path='add-job' element={<CreateJob/>}/>
-      <Route path='assign-job' element={<AdminAssign/>}/>
       <Route path='listed-job' element={<ExcelJob/>}/>
+      <Route path='report-section' element={<ReportSection/>}/>
     </Route>
     <Route
       path="/dispatcher-dashboard"
       element={<PrivateRoute element={<DispatcherDashPage />} userType="dispatcher" />}
     >
       <Route path='create-job' element={<CreateJob />}/>
-      <Route path='assign-jobs' element={<AdminAssign />}/>
       <Route path='job-lists' element={<ExcelJob />}/>
       <Route path='completed-job' element={<CompletedJob/>}/>
+      <Route path='report-section' element={<ReportSection/>}/>
     </Route> 
     <Route
       path="/container-dashboard"

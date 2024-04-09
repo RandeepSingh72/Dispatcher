@@ -5,10 +5,10 @@ const ContainerJob = () => {
   const { user } = useAuth();
   const [completeJob, setCompleteJob] = useState([]);
 
-  const getContainerJob = async (containerNumber) => {
+  const getContainerJob = async (userMainId) => {
     try {
       const response = await fetch(
-        `https://dispatcher-container.onrender.com/api/container-complete-job?containerNumber=${containerNumber}`,
+        `https://dispatcher-container.onrender.com/api/container-complete-job?userMainId=${userMainId}`,
         {
           method: "GET",
           headers: {
@@ -24,7 +24,7 @@ const ContainerJob = () => {
   };
 
   useEffect(() => {
-    getContainerJob(user.containerNumber);
+    getContainerJob(user.userMainId);
   }, []);
   return (
     <div className="m-5">
@@ -35,12 +35,12 @@ const ContainerJob = () => {
             style={{ position: "relative" }}
             className="bg-white p-2 font-semibold rounded-md mt-10"
           >
-            {job.containerNum ? (
+            {job.userMainId ? (
               <div
                 style={{ position: "absolute" }}
                 className="top-[-31px] left-0 bg-blue-600 my-2 px-2 rounded-t-md font-semibold text-white"
               >
-                <div>Container No. {job.containerNum}</div>
+                <div>User ID {job.userMainId}</div>
               </div>
             ) : (
               ""
@@ -63,6 +63,9 @@ const ContainerJob = () => {
                 </div>
                 <div>
                   DG - <span className='font-normal'>{job.dg}</span> 
+                </div>
+                <div>
+                  Container Number - <span className='font-normal'>{job.containerNumber}</span> 
                 </div>
               </div>
 

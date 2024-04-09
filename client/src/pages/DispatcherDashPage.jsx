@@ -1,10 +1,10 @@
 import React from "react";
-import { Outlet, useLocation, Link } from "react-router-dom";
+import { Outlet, useLocation, Link} from "react-router-dom";
 import DispatcherSidebar from "../components/DispatcherSidebar";
 
 const DispatcherDashPage = () => {
   const { pathname } = useLocation();
-
+ 
   return (
     <div>
       <div className="flex justify-between items-center">

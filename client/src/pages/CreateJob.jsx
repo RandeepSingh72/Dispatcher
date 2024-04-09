@@ -10,6 +10,8 @@ const CreateJob = () => {
   const [jobStart, setJobStart] = useState("");
   const [size, setSize] = useState("20");
   const [release, setRelease] = useState("");
+  const [containerNumber, setContainerNumber] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
   const [slot, setSlot] = useState("");
   const [pin, setPin] = useState("");
   const [dg, setDg] = useState("Yes");
@@ -20,8 +22,19 @@ const CreateJob = () => {
   const [instructions, setInstructions] = useState("");
   const [options, setOptions] = useState([]);
 
-  const [update, setUpdate] = useState('')
- 
+  const [update, setUpdate] = useState("");
+
+  const handleInputChange = (e) => {
+    const { value } = e.target;
+    if (selectedOption === "Release") {
+      setRelease(value);
+      setContainerNumber('')
+    } else if (selectedOption === "Container Number") {
+      setContainerNumber(value);
+      setRelease('')
+    }
+  };
+
   const openModal = () => {
     setIsOpen(true);
   };
@@ -34,26 +47,32 @@ const CreateJob = () => {
     e.preventDefault();
 
     try {
+      let formData = {
+        uplift,
+        offload,
+        jobStart,
+        size,
+        slot,
+        pin,
+        random,
+        doors,
+        commodityCode,
+        dg,
+        instructions,
+        weight,
+      };
+  
+      if (selectedOption === "Release") {
+        formData = { ...formData, release };
+      } else if (selectedOption === "Container Number") {
+        formData = { ...formData, containerNumber };
+      }
       const response = await fetch("https://dispatcher-container.onrender.com/api/createJob", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          uplift,
-          offload,
-          jobStart,
-          size,
-          release,
-          slot,
-          pin,
-          random,
-          doors,
-          commodityCode,
-          dg,
-          instructions,
-          weight,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
@@ -130,8 +149,6 @@ const CreateJob = () => {
 
     fetchOptions();
   }, [update]);
-
-
 
   return (
     <div>
@@ -299,8 +316,8 @@ const CreateJob = () => {
           </div>
 
           <div>
-            <label htmlFor="release" className="font-semibold">
-              Release
+            <label htmlFor="selectOption" className="font-semibold">
+              Select Release or Container
             </label>
             <div className="relative flex items-center text-gray-700 mt-2">
               <svg
@@ -317,17 +334,56 @@ const CreateJob = () => {
                   d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                 />
               </svg>
-              <input
-                type="text"
-                value={release}
-                onChange={(e) => setRelease(e.target.value)}
-                placeholder="Release"
-                required
-                id="release"
+              <select
+                id="selectOption"
+                value={selectedOption}
+                onChange={(e) => setSelectedOption(e.target.value)}
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
-              />
+              >
+                <option value="">Select an option</option>
+                <option value="Release">Release</option>
+                <option value="Container Number">Container Number</option>
+              </select>
             </div>
           </div>
+          {selectedOption && (
+            <div>
+              <label
+                htmlFor={selectedOption.toLowerCase()}
+                className="font-semibold"
+              >
+                {selectedOption}
+              </label>
+              <div className="relative flex items-center text-gray-700 mt-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6 absolute ml-3"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  value={
+                    selectedOption === "Release" ? release : containerNumber
+                  }
+                  onChange={handleInputChange}
+                  placeholder={`Enter ${selectedOption}`}
+                  required
+                  id={selectedOption.toLowerCase()}
+                  className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
+                />
+              </div>
+            </div>
+          )}
+
           <div>
             <label htmlFor="slot" className="font-semibold">
               VBS / Slot
@@ -352,7 +408,6 @@ const CreateJob = () => {
                 value={slot}
                 onChange={(e) => setSlot(e.target.value)}
                 placeholder="Enter VBS/Slot"
-                required
                 id="slot"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
               />
@@ -382,7 +437,6 @@ const CreateJob = () => {
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="Pin"
-                required
                 id="pin"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
               />
@@ -412,7 +466,6 @@ const CreateJob = () => {
                 value={random}
                 onChange={(e) => setRandom(e.target.value)}
                 placeholder="Random"
-                required
                 id="random"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
               />
@@ -442,7 +495,6 @@ const CreateJob = () => {
                 value={doors}
                 onChange={(e) => setDoors(e.target.value)}
                 placeholder="Doors"
-                required
                 id="doors"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
               />
@@ -472,7 +524,6 @@ const CreateJob = () => {
                 value={commodityCode}
                 onChange={(e) => setCommodityCode(e.target.value)}
                 placeholder="Commodity Code"
-                required
                 id="commodity"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
               />
@@ -530,7 +581,6 @@ const CreateJob = () => {
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="Weight (in Kg)"
-                required
                 id="weight"
                 className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
               />
@@ -546,7 +596,6 @@ const CreateJob = () => {
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             placeholder="Special Instructions"
-            required
             id="instruction"
             className="mt-2 py-2 px-2 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
           />

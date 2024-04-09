@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import image1 from "../assets/image 1.png";
 import truck from "../assets/truck.jpg";
+import { useAuth } from "../context/AuthContext";
 
 const HomePage = () => {
-  const { isLoggedIn, user, setUser } = useAuth();
   const navigate = useNavigate();
+  const {setUser} = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,6 +24,7 @@ const HomePage = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token);
+        localStorage.setItem("userInfo", JSON.stringify(data.user));
         setUsername("");
         setPassword("");
         if (data.user.userType === "admin") {
@@ -50,46 +51,18 @@ const HomePage = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          throw new Error("Token not found");
-        }
-
-        const response = await fetch("https://dispatcher-container.onrender.com/api/user", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-          console.log(user);
-          // Check if user is logged in and userType is available
-          if (userData.userType) {
-            const dashboardRoute = `/${userData.userType.toLowerCase()}-dashboard`;
-            // Check if the current route is not already the dashboard route
-            if (window.location.pathname !== dashboardRoute) {
-              navigate(dashboardRoute);
-            }
-          }
-        } else {
-          throw new Error("Failed to fetch user");
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-    if (isLoggedIn()) {
-      fetchUser();
+  const checkLocalStorageLogin = () => {
+    const userInfoString = localStorage.getItem("userInfo");
+    const userInfo = JSON.parse(userInfoString);
+    setUser(userInfo)   
+    if (userInfo) {
+      navigate(`/${userInfo.userType.toLowerCase()}-dashboard`);
     }
-  }, []);
+  };
+
+useEffect(()=>{
+  checkLocalStorageLogin();
+}, [])
 
   return (
     <div className="flex items-center justify-center min-h-screen">

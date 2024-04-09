@@ -10,8 +10,7 @@ const userSchema = new mongoose.Schema({
       enum: ['dispatcher', 'container', 'admin'],
       default: 'container',
     },
-    containerNumber: {type: String, required: false},
-    assigned: {type: String, required: false},
+    userMainId: {type: String, required: false},
 });
   
 const User = mongoose.model('User', userSchema);

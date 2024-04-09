@@ -77,12 +77,12 @@ const Sidebar = () => {
           Add Job
         </Link>
         <Link
-          to="/admin-dashboard/assign-job"
+          to="/admin-dashboard/report-section"
           className={`block m-1 mb-3 rounded-md hover:font-bold ${
-            location.pathname === '/admin-dashboard/assign-job' ? 'font-bold' : 'text-gray-800'
+            location.pathname === '/admin-dashboard/report-section' ? 'font-bold' : 'text-gray-800'
           }`}
         >
-          Assign Job
+          Report Section
         </Link>
         <Link
           to="/admin-dashboard/listed-job"

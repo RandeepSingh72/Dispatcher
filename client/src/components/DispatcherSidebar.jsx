@@ -60,20 +60,20 @@ const DispatcherSidebar = () => {
        Add Job
       </Link>
       <Link
-        to="/dispatcher-dashboard/assign-jobs"
-        className={`block m-1 mb-3 mt-3 rounded-md hover:font-bold ${
-          location.pathname === '/dispatcher-dashboard/assign-jobs' ? 'font-bold' : 'text-gray-800'
-        }`}
-      >
-       Assign Job
-      </Link>
-      <Link
         to="/dispatcher-dashboard/job-lists"
         className={`block m-1 mb-3 mt-3 rounded-md hover:font-bold ${
           location.pathname === '/dispatcher-dashboard/job-lists' ? 'font-bold' : 'text-gray-800'
         }`}
       >
       Job List
+      </Link>
+      <Link
+        to="/dispatcher-dashboard/report-section"
+        className={`block m-1 mb-3 mt-3 rounded-md hover:font-bold ${
+          location.pathname === '/dispatcher-dashboard/report-section' ? 'font-bold' : 'text-gray-800'
+        }`}
+      >
+      Report Section
       </Link>
       <Link
         to="/dispatcher-dashboard/completed-job"

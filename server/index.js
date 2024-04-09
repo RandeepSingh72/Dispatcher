@@ -4,12 +4,13 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const app = express()
-const port = process.env.PORT ||  10000;
+const port = process.env.PORT || 10000;
 const cors = require('cors');
 const User = require('./models/usersModel');
 const Address = require('./models/address');
 const { default: mongoose } = require('mongoose');
 const Job = require('./models/jobModel');
+const SafetyForm = require('./models/safetyForm');
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'https://fastidious-lily-d3f9aa.netlify.app');
@@ -80,10 +81,21 @@ const addAdminUser = async () => {
     );
 
     // Respond with the token and user information
-    res.json({
-      token,
-      user: {userId:user._id, username: user.username, email: user.email, userType: user.userType},
-    });
+    const userData = {
+     userId: user._id,
+     username: user.username,
+     email: user.email,
+     userType: user.userType,
+   };
+   
+   if (user.userMainId) {
+     userData.userMainId = user.userMainId;
+   }
+   
+   res.json({
+     token,
+     user: userData,
+   });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -124,15 +136,15 @@ app.get('/api/user', async (req, res) => {
 });
 
 app.post('/api/saveUser', async(req, res) => {
- const {username, email, password, containerNumber, userType} = req.body; 
+ const {username, email, password, userMainId, userType} = req.body; 
  await mongoose.connect(process.env.MONGODB_URL)
   try {
     // Check if the admin user already exists
     const isUser = await User.findOne({ username });
-    if (containerNumber !== undefined) {
-     const isContainer = await User.findOne({containerNumber});
-     if (isContainer) {
-       res.json({code: 'container', message: 'This Container Number is Already Exists, Please Select Different'})
+    if (userMainId !== undefined) {
+     const isMainId = await User.findOne({userMainId});
+     if (isMainId) {
+       res.json({code: 'ID', message: 'This User ID is Already Exists, Please Select Different'})
        return;
       }
     }
@@ -146,7 +158,7 @@ app.post('/api/saveUser', async(req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a new admin user
-    const user = new User({ username, password: hashedPassword, email, userType, containerNumber });
+    const user = new User({ username, password: hashedPassword, email, userType, userMainId });
     await user.save();
 
     res.json({success: true, message: 'Data saved successfully'})
@@ -189,9 +201,9 @@ app.get('/api/allUsers', async(req, res) => {
 
 app.post('/api/createJob', async (req, res) => {
  await mongoose.connect(process.env.MONGODB_URL)
- const {uplift, offload, jobStart, size, release, slot, pin, random, doors, commodityCode, instructions, dg, weight} = req.body;
+ const {uplift, offload, jobStart, size, release, containerNumber, slot, pin, random, doors, commodityCode, instructions, dg, weight} = req.body;
  try {
-   const createJob = new Job({uplift, offload, jobStart, size, release, slot, pin, random, doors, commodityCode, dg, weight, instructions, complete: 'no'});
+   const createJob = new Job({uplift, offload, jobStart, size, release, containerNumber, slot, pin, random, doors, commodityCode, dg, weight, instructions, complete: 'no'});
    await createJob.save();
    res.json({success: true, message: 'Job Created Successfully'});
  } catch (error) {
@@ -229,10 +241,7 @@ app.get('/api/allJobs', async(req, res) => {
 app.get('/api/unassigned', async(req, res) => {
  await mongoose.connect(process.env.MONGODB_URL)
  try {
-   const unassignedContainers = await User.find(
-     { userType: 'container', $or: [{ assigned: 'no' }, { assigned: { $exists: false } }] },
-     'containerNumber assigned'
-   );
+   const unassignedContainers = await User.find({userType: 'container'});
    res.json(unassignedContainers);
  } catch (error) {
    res.status(500).json({ success: false, error: error.message });
@@ -241,9 +250,9 @@ app.get('/api/unassigned', async(req, res) => {
 
 app.put('/api/updateJob', async(req, res) => {
  await mongoose.connect(process.env.MONGODB_URL)
- const {selectedContainer, jobId} = req.body;
+ const {selectedId, jobId} = req.body;
  try {
-   const updatedJob = await Job.findByIdAndUpdate(jobId, { containerNum: selectedContainer});
+   const updatedJob = await Job.findByIdAndUpdate(jobId, { userMainId: selectedId});
 
    if (!updatedJob) {
      return res.status(404).json({ error: 'Job not found' });
@@ -254,37 +263,18 @@ app.put('/api/updateJob', async(req, res) => {
  }
 })
 
-app.put('/api/assign-container', async(req, res) => {
- await mongoose.connect(process.env.MONGODB_URL)
- const {selectedContainer} = req.body;
- try {
-   const assignedValue = 'yes';
-   
-
-   // Find the user by container number
-   const updatedUser = await User.findOneAndUpdate(
-     { containerNumber: selectedContainer },
-     { $set: { assigned: assignedValue } },
-     { new: true, upsert: true }
-   );
-
-   res.json(updatedUser);
- } catch (error) {
-   res.status(500).json({ success: false, error: error.message });
- }
-})
 
 app.get('/api/container-job', async(req, res) => {
  try {
    await mongoose.connect(process.env.MONGODB_URL);
 
-   const { containerNumber } = req.query;
+   const { userMainId } = req.query;
 
-   if (!containerNumber) {
-     return res.status(400).json({ message: 'Container number is required' });
+   if (!userMainId) {
+     return res.status(400).json({ message: 'User ID is required' });
    }
 
-   const jobs = await Job.find({ containerNum: containerNumber, complete: 'no' });
+   const jobs = await Job.find({ userMainId: userMainId, complete: 'no' });
 
    res.json({ jobs });
  } catch (error) {
@@ -322,14 +312,6 @@ app.put('/api/updateStatus', async(req, res) => {
      return res.status(404).json({ success: false, error: 'Job not found' });
    }
 
-   // Update the user's assigned field to 'no' when the job stage is 'done'
-   if (jobStage === 'done' && updatedJob.containerNum) {
-     await User.findOneAndUpdate(
-       { containerNumber: updatedJob.containerNum },
-       { assigned: 'no' }
-     );
-   }
-
    res.json({ success: true, job: updatedJob });
  } catch (error) {
    res.status(500).json({ success: false, error: error.message });
@@ -353,13 +335,13 @@ app.get('/api/container-complete-job', async(req, res) => {
  try {
    await mongoose.connect(process.env.MONGODB_URL);
 
-   const { containerNumber } = req.query;
+   const { userMainId } = req.query;
 
-   if (!containerNumber) {
+   if (!userMainId) {
      return res.status(400).json({ message: 'Container number is required' });
    }
 
-   const jobs = await Job.find({ containerNum: containerNumber, complete: 'yes' });
+   const jobs = await Job.find({ userMainId: userMainId, complete: 'yes' });
 
    res.json({ jobs });
  } catch (error) {
@@ -368,14 +350,72 @@ app.get('/api/container-complete-job', async(req, res) => {
 })
 
 app.get('/api/jobs/all', async(req, res) => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URL);
-    const jobs = await Job.find({});
-    res.json({ jobs });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+ try {
+   await mongoose.connect(process.env.MONGODB_URL);
+   const jobs = await Job.find({});
+   res.json({ jobs });
+ } catch (error) {
+   res.status(500).json({ success: false, error: error.message });
+ }
 })
+
+app.post('/api/safetyForm', async (req, res) => {
+ const { firstName, surname, addressSite, jobNumber, fitForDuty, mealBreak, PPE, message } = req.body;
+
+ try {
+   await mongoose.connect(process.env.MONGODB_URL);
+   // Create a new SafetyForm document and save it to the database
+   const newForm = new SafetyForm({
+     firstName,
+     surname,
+     addressSite,
+     jobNumber,
+     fitForDuty,
+     mealBreak,
+     PPE,
+     message,
+   });
+   await newForm.save();
+
+   // Send a response indicating success
+   res.json({ success: true, message: 'Form data saved successfully' });
+ } catch (error) {
+   console.log(error);
+   res.status(500).json({ success: false, message: 'Error saving form data' });
+ }
+});
+
+app.get('/api/reportJobs', async(req, res) => {
+ try {
+   await mongoose.connect(process.env.MONGODB_URL);
+   const { date } = req.query; // Assuming the date is passed as a query parameter
+   if (!date) {
+     return res.status(400).json({ success: false, error: 'Date parameter is required' });
+   }
+   const inputDate = new Date(date);
+
+   // Extract the year, month, and day from the input date
+   const year = inputDate.getFullYear();
+   const month = inputDate.getMonth() + 1; // Months are zero-based in JavaScript
+   const day = inputDate.getDate();
+
+   // Construct the date string in the format YYYY-MM-DD for comparison
+   const formattedDate = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+
+   // Query MongoDB using Mongoose to fetch jobs where the 'done' date matches the input date
+   const jobs = await Job.find({
+     'status.type': 'done',
+     'status.timestamp': {
+       $gte: new Date(formattedDate), // Start of input date
+       $lt: new Date(formattedDate + 'T23:59:59.999Z'), // End of input date (23:59:59.999)
+     },
+   });
+   res.json({ success: true, data: jobs });
+ } catch (error) {
+   res.status(500).json({ success: false, error: error.message });
+ }
+})
+
  // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

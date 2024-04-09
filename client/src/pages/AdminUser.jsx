@@ -5,9 +5,9 @@ const AdminUser = () => {
   const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [containerNumber, setContainerNumber] = useState("");
+  const [userMainId, setUserMainId] = useState("");
   const [message, setMessage] = useState("");
-  const [containerMessage, setContainerMessage] = useState("");
+  const [idMessage, setIdMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +23,7 @@ const AdminUser = () => {
             username,
             email,
             password,
-            containerNumber,
+            userMainId,
             userType,
           }),
         });
@@ -32,19 +32,19 @@ const AdminUser = () => {
         const data = await response.json();
 
         if (data.success === true) {
-          setContainerNumber(""),
+          setUserMainId(""),
             setEmail(""),
             setPassword(""),
             setUserName(""),
             setUserType("container"),
             setMessage(""),
-            setContainerMessage("");
+            setIdMessage("");
         }
-        if (data.code === "container") {
-          setContainerMessage(data.message);
+        if (data.code === "ID") {
+          setIdMessage(data.message);
         }
-        if (data.code !== "container") {
-          setContainerMessage("");
+        if (data.code !== "ID") {
+          setIdMessage("");
         }
         if (data.code === "user") {
           setMessage(data.message);
@@ -77,10 +77,13 @@ const AdminUser = () => {
             setUserName(""),
             setUserType("container"),
             setMessage(""),
-            setContainerMessage("");
+            setIdMessage("");
         }
-        if (data.code === "container") {
-          setContainerMessage(data.message);
+        if (data.code === "ID") {
+          setIdMessage(data.message);
+        }
+        if (data.code !== "ID") {
+          setIdMessage("");
         }
         if (data.code === "user") {
           setMessage(data.message);
@@ -137,7 +140,7 @@ const AdminUser = () => {
           {userType === "container" && (
             <div className="mb-3">
               <label htmlFor="container-number" className="font-semibold">
-                Container Number
+                User ID
               </label>
               <div className="relative flex items-center text-gray-700 mt-2">
                 <svg
@@ -158,15 +161,15 @@ const AdminUser = () => {
                 <input
                   type="text"
                   id="container-number"
-                  value={containerNumber}
-                  onChange={(e) => setContainerNumber(e.target.value)}
+                  value={userMainId}
+                  onChange={(e) => setUserMainId(e.target.value)}
                   required
-                  placeholder="Container Number"
+                  placeholder="User ID"
                   className="py-2 pr-3 pl-10 font-semibold placeholder-gray-500 rounded-xl border-none outline-none bg-purple-70 w-full"
                 />
               </div>
 
-              <span className="text-red-500">{containerMessage}</span>
+              <span className="text-red-500">{idMessage}</span>
             </div>
           )}
           <div className="mb-3">

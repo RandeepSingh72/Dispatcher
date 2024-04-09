@@ -1,105 +1,110 @@
-import React, {useState, useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import Sidebar from '../components/Sidebar'
+import React, { useState, useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 
 const AdminDashPage = () => {
-  const [users, setUsers] = useState([])
-  const navigate = useNavigate()
-  const {pathname} = useLocation()
-  const {user, setUser } = useAuth();
+  const [users, setUsers] = useState([]);
+  const { pathname } = useLocation();
+  const [selectedTab, setSelectedTab] = useState("container");
 
-  const fetchAllUsers = async() => {
+  const fetchAllUsers = async () => {
     try {
-      const response = await fetch('https://dispatcher-container.onrender.com/api/allUsers', {
-        method: 'GET',
+      const response = await fetch("https://dispatcher-container.onrender.com/api/allUsers", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
       const allUsers = await response.json();
-      setUsers(allUsers.users)
+      console.log(allUsers.users);
+      setUsers(allUsers.users);
     } catch (error) {
       console.log(error);
-    }
-  }
- 
-
-
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('Token not found');
-      }
-
-      const response = await fetch('https://dispatcher-container.onrender.com/api/user', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-         const userData = await response.json();
-         setUser(userData);
-        // Check if user is logged in and userType is available
-        if (userData.userType) {
-          const dashboardRoute = `/${userData.userType.toLowerCase()}-dashboard`;
-          // Check if the current route is not already the dashboard route
-          if (window.location.pathname !== dashboardRoute) {
-            navigate(dashboardRoute);
-          }
-        }
-      } else {
-        throw new Error('Failed to fetch user');
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
     }
   };
 
   useEffect(() => {
-  fetchAllUsers()
-  if (user === undefined) {
-    fetchUser();
-  }
+    fetchAllUsers();
   }, []);
-  useEffect(() => {
-    fetchAllUsers()
-    if (user === undefined) {
-      fetchUser();
-    }
-    }, [pathname]);
 
-  console.log(user);
+  useEffect(() => {
+    if (pathname !== '/admin-dashboard') {
+      setSelectedTab("");
+    }
+     // Reset selectedTab to empty string when URL changes
+  }, [pathname]);
+
+  const handleTabChange = (tab) => {
+    setSelectedTab(tab);
+  };
+
   return (
     <div>
-      <div className='flex justify-between items-center'>
-      <Sidebar/>
-      
+      <div className="flex justify-between items-center">
+        <Sidebar />
       </div>
-          {pathname !== '/admin-dashboard' ? <Outlet/> : (
-            <div className='m-5 flex flex-row'>
-              <div className='p-2 m-2 bg-white rounded-xl'>
-                <div className='mr-6 ml-1'>
-                <h2>Container</h2>
-                <span className='font-bold'>{users.filter(user => user.userType === 'container').length}</span>
+      {pathname !== "/admin-dashboard" ? (
+        <Outlet />
+      ) : (
+        <div className="flex justify-center items-center mt-8">
+          <button
+            className={`px-4 py-2 mr-4 rounded-tl-lg font-semibold rounded-bl-lg focus:outline-none ${
+              selectedTab === "container"
+                ? "bg-blue-500 text-white"
+                : "bg-white text-gray-700"
+            }`}
+            onClick={() => handleTabChange("container")}
+          >
+            Container (
+            {users.filter((user) => user.userType === "container").length})
+          </button>
+          <button
+            className={`px-4 py-2 mr-4 font-semibold rounded-tr-lg rounded-br-lg focus:outline-none ${
+              selectedTab === "dispatcher"
+                ? "bg-blue-500 text-white"
+                : "bg-white text-gray-700"
+            }`}
+            onClick={() => handleTabChange("dispatcher")}
+          >
+            Dispatcher (
+            {users.filter((user) => user.userType === "dispatcher").length})
+          </button>
+        </div>
+      )}
+      {/* Conditionally render based on the selected tab */}
+      {selectedTab === "container" && (
+        <div className="container-tab m-5 p-2 bg-white rounded-md">
+          {users.map((user) => {
+            if (user.userType === "container") {
+              return (
+                <div key={user._id} className="bg-purple-70 m-2 p-2 rounded-md">
+                <span>UserName - {user.username}</span> <br/>
+                <span>UserID - {user.userMainId}</span> <br/>
+                <span>Email - {user.email}</span>
                 </div>
-              </div>
-
-              <div className='p-2 m-2 bg-white rounded-xl'>
-                <div className='mr-6 ml-1'>
-                <h2>Dispatcher</h2>
-                <span className='font-bold'>{users.filter(user => user.userType === 'dispatcher').length}</span>
+              );
+            }
+            return null;
+          })}
+        </div>
+      )}
+      {selectedTab === "dispatcher" && (
+        <div className="dispatcher-tab m-5 p-2 bg-white rounded-md">
+          {users.map((user) => {
+            if (user.userType === "dispatcher") {
+              return (
+                <div key={user._id} className="bg-purple-70 m-2 p-2 rounded-md">
+                <span>UserName - {user.username}</span> <br/>
+                <span>Email - {user.email}</span>
                 </div>
-              </div>
-            </div>
-          )}
+              );
+            }
+            return null;
+          })}
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default AdminDashPage;
